@@ -1,48 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import ContactForm from './components/ContactForm/ContactForm';
 import ContactList from './components/ContactList/ContactList';
 import SearchBox from './components/SearchBox/SearchBox';
 import css from './App.module.css';
 
-const LS_KEY = 'contacts';
+import { fetchContacts, addContact, deleteContact } from './redux/contactsOps';
+import { selectContacts, selectError, selectLoading } from './redux/contactsSlice';
 
 const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    const stored = localStorage.getItem(LS_KEY);
-    return stored
-      ? JSON.parse(stored)
-      : [
-          { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-          { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-          { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-          { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-        ];
-  });
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const isLoading = useSelector(selectLoading);
+  const error = useSelector(selectError);
 
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    localStorage.setItem(LS_KEY, JSON.stringify(contacts));
-  }, [contacts]);
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
-  const addContact = (newContact) => {
-    setContacts((prev) => [...prev, newContact]);
+  const handleAddContact = newContact => {
+    dispatch(addContact(newContact));
   };
 
-  const deleteContact = (id) => {
-    setContacts((prev) => prev.filter((c) => c.id !== id));
+  const handleDelete = id => {
+    dispatch(deleteContact(id));
   };
 
-  const filteredContacts = contacts.filter((contact) =>
+  const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
     <div className={css.container}>
       <h1>Phonebook</h1>
-      <ContactForm onAdd={addContact} />
+      <ContactForm onAdd={handleAddContact} />
       <SearchBox filter={filter} onChange={setFilter} />
-      <ContactList contacts={filteredContacts} onDelete={deleteContact} />
+      {isLoading && <p>Loading contacts...</p>}
+      {error && <p>Error: {error}</p>}
+      <ContactList contacts={filteredContacts} onDelete={handleDelete} />
     </div>
   );
 };
