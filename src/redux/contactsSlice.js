@@ -1,6 +1,8 @@
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { fetchContacts, addContact, deleteContact } from './contactsOps';
 import { createSelector } from '@reduxjs/toolkit';
+import { selectFilter } from '../redux/filterSlice'; 
+
 
 
 // Початковий стан
@@ -44,7 +46,6 @@ const contactsSlice = createSlice({
 
 // Селектори
 export const selectContacts = state => state.contacts.items;
-export const selectFilter = state => state.filter;
 
 export const selectFilteredContacts = createSelector(
   [selectContacts, selectFilter],
@@ -59,3 +60,4 @@ export const selectFilteredContacts = createSelector(
 export const selectError = state => state.contacts.error;
 export const selectLoading = state => state.contacts.isLoading;
 export default contactsSlice.reducer;
+
