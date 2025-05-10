@@ -3,8 +3,6 @@ import { logOutSuccess } from './authSlice';
 import axios from 'axios';
 import api from '../../services/api';
 
-import axios from 'axios';
-
 const setAuthHeader = token => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
