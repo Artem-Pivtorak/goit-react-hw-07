@@ -5,6 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchContacts } from '../../redux/contacts/operations';
 import { selectIsLoggedIn } from '../../redux/auth/selectors';
 
+import ContactForm from '..//../components/ContactForm/ContactForm';
+
+import ContactList from '..//../components/ContactList/ContactList';
+import Filter from '..//../components/Filter/Filter';
 
 export default function ContactsPage() {
   const dispatch = useDispatch();
@@ -16,5 +20,12 @@ export default function ContactsPage() {
     }
   }, [dispatch, isLoggedIn]);
 
-  // ...рендер контактів
+  return (
+    <div>
+      <h1>Контакти</h1>
+      <ContactForm />
+      <Filter />
+      <ContactList />
+    </div>
+  );
 }
