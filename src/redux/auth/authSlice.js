@@ -19,7 +19,12 @@ const authSlice = createSlice({
   extraReducers: builder => {
     builder
       // логін
-      .addCase(logIn.fulfilled, (state, { payload }) => {})
+      .addCase(logIn.fulfilled, (state, { payload }) => {
+  state.user = payload.user;
+  state.token = payload.token;
+  state.isLoggedIn = true;
+})
+
       // логаут
       .addCase(logOut.fulfilled, state => {})
       // refreshUser

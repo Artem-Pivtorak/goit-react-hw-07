@@ -1,17 +1,26 @@
-
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logIn } from '../../redux/auth/operations';
+import { useNavigate } from 'react-router-dom';
 
 export const LoginForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();            // ← додаємо useNavigate
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     console.log('Submitting', { email, password });
-    dispatch(logIn({ email, password }));
+    const resultAction = await dispatch(logIn({ email, password }));
+    if (logIn.fulfilled.match(resultAction)) {
+      // ← при успіху переходимо на /contacts
+      navigate('/contacts');
+    } else {
+      // ← при невдачі показуємо повідомлення
+      const msg = resultAction.payload?.message || 'Login failed';
+      alert(msg);
+    }
   };
 
   return (
