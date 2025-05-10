@@ -1,7 +1,17 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { logOutSuccess } from './authSlice';
 import axios from 'axios';
-axios.defaults.baseURL = 'https://connections-api.goit.global/';
+import api from '../../services/api';
+
+import axios from 'axios';
+
+const setAuthHeader = token => {
+  axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+};
+
+const clearAuthHeader = () => {
+  delete axios.defaults.headers.common.Authorization;
+};
 
 
 // Логін
@@ -66,3 +76,6 @@ export const refreshUser = createAsyncThunk(
     }
   }
 );
+
+
+export { setAuthHeader, clearAuthHeader };
