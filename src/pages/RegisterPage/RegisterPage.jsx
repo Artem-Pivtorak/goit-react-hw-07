@@ -1,13 +1,13 @@
-// src/pages/RegisterPage/RegisterPage.jsx
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RegisterForm } from '../../components/RegisterForm/RegisterForm';
 
 export default function RegisterPage() {
-  return (
-    <div>
-      <h1>Register</h1>
-      <RegisterForm />
-    </div>
-  );
+  const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    navigate('/contacts');
+  };
+
+  return <RegisterForm onSuccess={handleSuccess} />;
 }

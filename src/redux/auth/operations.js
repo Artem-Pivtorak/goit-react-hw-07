@@ -1,63 +1,58 @@
+// src/redux/auth/operations.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { logOutSuccess } from './authSlice';
-import axios from 'axios';
 import api from '../../services/api';
 
+// Допоміжні функції для заголовка авторизації
 const setAuthHeader = token => {
-  axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+  api.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
-
 const clearAuthHeader = () => {
-  delete axios.defaults.headers.common.Authorization;
+  delete api.defaults.headers.common.Authorization;
 };
-
-
-// Логін
-export const logIn = createAsyncThunk(
-  'auth/logIn',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.post('/users/login', credentials);
-      axios.defaults.headers.common.Authorization = `Bearer ${data.token}`;
-      console.log('API baseURL:', axios.defaults.baseURL);
-
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
 
 // Реєстрація
 export const register = createAsyncThunk(
   'auth/register',
   async (credentials, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post('/users/signup', credentials);
-      axios.defaults.headers.common.Authorization = `Bearer ${data.token}`;
+      const { data } = await api.post('/users/signup', credentials);
+      setAuthHeader(data.token);
       return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Логін
+export const logIn = createAsyncThunk(
+  'auth/logIn',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post('/users/login', credentials);
+      setAuthHeader(data.token);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 // Вихід
 export const logOut = createAsyncThunk(
-  'auth/logOut',
-  async (_, { dispatch, rejectWithValue }) => {
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
     try {
-      await axios.post('/users/logout');
-      dispatch(logOutSuccess());
-      delete axios.defaults.headers.common.Authorization;
+      const { data } = await api.post('/users/logout');
+      clearAuthHeader();
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
-// Оновлення даних поточного користувача
+// Оновлення поточного користувача
 export const refreshUser = createAsyncThunk(
   'auth/refreshUser',
   async (_, { getState, rejectWithValue }) => {
@@ -65,15 +60,12 @@ export const refreshUser = createAsyncThunk(
     if (!token) {
       return rejectWithValue('No token available');
     }
-    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    setAuthHeader(token);
     try {
-      const { data } = await axios.get('/users/current');
+      const { data } = await api.get('/users/current');
       return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
-
-
-export { setAuthHeader, clearAuthHeader };

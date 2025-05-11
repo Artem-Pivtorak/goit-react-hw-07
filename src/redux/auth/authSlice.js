@@ -1,6 +1,6 @@
-
+// src/redux/auth/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { logIn, logOut, refreshUser } from './operations';
+import { register, logIn, logOut, refreshUser } from './operations';
 
 const initialState = {
   user: null,
@@ -13,34 +13,46 @@ const initialState = {
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {
-    logOutSuccess(state) {},
-  },
+  reducers: {},
   extraReducers: builder => {
     builder
-      // логін
+      // Успішна реєстрація
+      .addCase(register.fulfilled, (state, { payload }) => {
+        state.user = payload.user;
+        state.token = payload.token;
+        state.isLoggedIn = true;
+        state.error = null;
+      })
+      // Успішний логін
       .addCase(logIn.fulfilled, (state, { payload }) => {
-  state.user = payload.user;
-  state.token = payload.token;
-  state.isLoggedIn = true;
-})
-
-      // логаут
-      .addCase(logOut.fulfilled, state => {})
-      // refreshUser
+        state.user = payload.user;
+        state.token = payload.token;
+        state.isLoggedIn = true;
+        state.error = null;
+      })
+      // Вихід
+      .addCase(logOut.fulfilled, state => {
+        state.user = null;
+        state.token = null;
+        state.isLoggedIn = false;
+        state.error = null;
+      })
+      // Початок оновлення юзера
       .addCase(refreshUser.pending, state => {
         state.isRefreshing = true;
       })
+      // Успішне оновлення (коли сторінка перезавантажена, але токен вже в persist)
       .addCase(refreshUser.fulfilled, (state, { payload }) => {
         state.user = payload.user;
         state.isLoggedIn = true;
         state.isRefreshing = false;
+        state.error = null;
       })
+      // Помилка оновлення (наприклад, немає токена)
       .addCase(refreshUser.rejected, state => {
         state.isRefreshing = false;
       });
   },
 });
 
-export const { logOutSuccess } = authSlice.actions;
 export default authSlice.reducer;

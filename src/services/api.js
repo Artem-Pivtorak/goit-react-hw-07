@@ -1,7 +1,11 @@
+// src/services/api.js
 import axios from 'axios';
 
-const instance = axios.create({
-  baseURL: 'https://connections-api.goit.global/',
+const api = axios.create({
+  baseURL: 'https://connections-api.goit.global',
 });
 
-export default instance;
+// Тепер виводимо вже після ініціалізації
+console.log('API baseURL is', api.defaults.baseURL);
+
+export default api;
